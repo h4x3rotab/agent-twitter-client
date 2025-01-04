@@ -29,8 +29,10 @@
   "dependencies": {
     "@roamhq/wrtc": "^0.8.0",
     "@sinclair/typebox": "^0.32.20",
+    "@types/node-fetch": "^2.6.12",
     "headers-polyfill": "^3.1.2",
     "json-stable-stringify": "^1.0.2",
+    "node-fetch": "^2.7.0",
     "otpauth": "^9.2.2",
     "set-cookie-parser": "^2.6.0",
     "tough-cookie": "^4.1.2",
