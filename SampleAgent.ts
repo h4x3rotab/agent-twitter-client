@@ -18,6 +18,8 @@ interface CacheData {
 
 const CACHE_FILE = './data/tweet_cache.json';
 const SCREENSHOT_API = 'https://memerepublic.ai/npc/getScreenshot';
+// Default interval is 30 minutes
+const CHECK_INTERVAL_MS = parseInt(process.env.CHECK_INTERVAL_MINUTES || '30') * 60 * 1000;
 
 async function getScreenshotData(): Promise<ScreenshotResponse> {
   // Check for mock data in environment variable
@@ -80,18 +82,8 @@ async function saveCache(data: CacheData): Promise<void> {
   }
 }
 
-async function main() {
+async function checkAndPostUpdate(scraper: Scraper): Promise<void> {
   try {
-    // Initialize scraper and login
-    const scraper = new Scraper();
-    // await scraper.login(
-    //   process.env.TWITTER_USERNAME!,
-    //   process.env.TWITTER_PASSWORD!,
-    //   process.env.TWITTER_EMAIL!,
-    //   process.env.TWITTER_TWO_FACTOR_SECRET!
-    // );
-    console.log('Logged in successfully!');
-
     // Fetch new content from API or mock data
     const data = await getScreenshotData();
     console.log('Screenshot data loaded', data);
@@ -113,6 +105,7 @@ async function main() {
       })
     );
     console.log('Media downloaded successfully.');
+
     // Send tweet
     // const result = await scraper.sendTweet(data.Text, undefined, mediaData);
     const result = '{"status": "success", "tweetId": "MockTweetId"}';
@@ -124,20 +117,57 @@ async function main() {
       mediaUrls: data.MediaUrls,
       timestamp: Date.now()
     });
+  } catch (error) {
+    console.error('Error in checkAndPostUpdate:', error);
+    // Don't exit process on error, just log it and continue the loop
+  }
+}
+
+async function main() {
+  let scraper: Scraper | null = null;
+
+  try {
+    // Initialize scraper and login (only once)
+    scraper = new Scraper();
+    // await scraper.login(
+    //   process.env.TWITTER_USERNAME!,
+    //   process.env.TWITTER_PASSWORD!,
+    //   process.env.TWITTER_EMAIL!,
+    //   process.env.TWITTER_TWO_FACTOR_SECRET!
+    // );
+    console.log('Logged in successfully!');
+
+    console.log(`Starting periodic check every ${CHECK_INTERVAL_MS/1000/60} minutes...`);
+    
+    // First check immediately after login
+    await checkAndPostUpdate(scraper);
+
+    // Then start the periodic loop
+    while (true) {
+      await new Promise(resolve => setTimeout(resolve, CHECK_INTERVAL_MS));
+      console.log(`\nPeriodic check at ${new Date().toISOString()}`);
+      await checkAndPostUpdate(scraper);
+    }
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Fatal error:', error);
     process.exit(1);
   }
 }
 
-// Run the main function
-main().then(() => {
-  console.log('Agent finished gracefully.');
-}).catch((error) => {
-  console.error('Error:', error);
-  process.exit(1);
-}).finally(() => {
-  console.log('Exiting...');
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\nReceived SIGINT. Shutting down gracefully...');
   process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\nReceived SIGTERM. Shutting down gracefully...');
+  process.exit(0);
+});
+
+// Run the main function
+main().catch((error) => {
+  console.error('Unhandled error:', error);
+  process.exit(1);
 });
