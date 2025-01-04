@@ -7,4 +7,4 @@ cd "$(dirname "$0")"
 # export MOCK_SCREENSHOT_RESPONSE='{"Text":"This is a test tweet","MediaUrls":["https://example.com/test.png"]}'
 
 # Run the agent using tsx (TypeScript execution)
-MOCK_SCREENSHOT_RESPONSE=./data/getScreenshot.json npx tsx SampleAgent.ts 
+LOG_LEVEL=debug MOCK_SCREENSHOT_RESPONSE=./data/getScreenshot.json npx tsx SampleAgent.ts 
