@@ -1154,7 +1154,7 @@ async function uploadMedia(
       if (state === 'succeeded') {
         processing = false;
       } else if (state === 'failed') {
-        throw new Error('Video processing failed');
+        throw new Error('Video processing failed ' + JSON.stringify(statusData));
       }
     }
   }
