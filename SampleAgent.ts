@@ -400,9 +400,10 @@ async function checkAndPostUpdate(scraper: Scraper): Promise<void> {
   }
 }
 
-async function main() {
-  let scraper: Scraper | null = null;
+// Handle graceful shutdown
+let scraper: Scraper | null = null;
 
+async function main() {
   try {
     // Initialize scraper and login (only once)
     scraper = new Scraper();
@@ -433,13 +434,23 @@ async function main() {
 }
 
 // Handle graceful shutdown
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   logger.info('Received SIGINT. Shutting down gracefully...');
+  if (scraper) {
+    await scraper.logout().catch((error: Error) => {
+      logger.error('Error during logout:', { error: serializeError(error) });
+    });
+  }
   process.exit(0);
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   logger.info('Received SIGTERM. Shutting down gracefully...');
+  if (scraper) {
+    await scraper.logout().catch((error: Error) => {
+      logger.error('Error during logout:', { error: serializeError(error) });
+    });
+  }
   process.exit(0);
 });
 
