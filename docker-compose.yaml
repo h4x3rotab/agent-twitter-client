@@ -1,0 +1,11 @@
+services:
+  agent-twitter-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent-twitter-client
+    environment:
+      - TWITTER_USERNAME=${TWITTER_USERNAME}
+      - TWITTER_PASSWORD=${TWITTER_PASSWORD}
+      - TWITTER_EMAIL=${TWITTER_EMAIL}
+      - TWITTER_TWO_FACTOR_SECRET=${TWITTER_TWO_FACTOR_SECRET}
