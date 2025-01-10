@@ -23,10 +23,10 @@ services:
 
   monitor:
     build:
-      context: .
-      dockerfile: monitor/Dockerfile
+      context: ./monitor
+      dockerfile: Dockerfile
     restart: always
-    container_name: gent-twitter-client-monitor
+    container_name: agent-twitter-client-monitor
     volumes:
       - ./data_prod:/app/data
     environment:
