@@ -1,3 +1,11 @@
+x-common: &common-config
+  restart: always
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '100m'
+      max-file: '5'
+
 services:
   agent-twitter-client:
     build:
@@ -5,8 +13,22 @@ services:
       dockerfile: Dockerfile
     restart: always
     container_name: agent-twitter-client
+    volumes:
+      - ./data_prod:/app/data
     environment:
       - TWITTER_USERNAME=${TWITTER_USERNAME}
       - TWITTER_PASSWORD=${TWITTER_PASSWORD}
       - TWITTER_EMAIL=${TWITTER_EMAIL}
       - TWITTER_TWO_FACTOR_SECRET=${TWITTER_TWO_FACTOR_SECRET}
+
+  monitor:
+    build:
+      context: .
+      dockerfile: monitor/Dockerfile
+    restart: always
+    container_name: gent-twitter-client-monitor
+    volumes:
+      - ./data_prod:/app/data
+    environment:
+      - LAST_TWEET_FILE_PATH=${LAST_TWEET_FILE_PATH}
+      - HOURS_THRESHOLD=${HOURS_THRESHOLD}
