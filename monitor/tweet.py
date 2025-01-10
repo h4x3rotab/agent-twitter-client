@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 
 # Get the file path from environment variable or use default
-LAST_TWEET_FILE_PATH = os.getenv("LAST_TWEET_FILE_PATH", "/app/data/last_tweet.json")
+LAST_TWEET_FILE_PATH = os.getenv("LAST_TWEET_FILE_PATH") or "/app/data/last_tweet.json"
 HOURS_THRESHOLD = int(os.getenv("HOURS_THRESHOLD") or "3")
 
 
