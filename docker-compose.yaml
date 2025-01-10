@@ -32,3 +32,5 @@ services:
     environment:
       - LAST_TWEET_FILE_PATH=${LAST_TWEET_FILE_PATH}
       - HOURS_THRESHOLD=${HOURS_THRESHOLD}
+    ports:
+      - 18000:8000

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 run.py
+poetry run python3 run.py
